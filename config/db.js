@@ -11,16 +11,9 @@ const pool = mysql.createPool({
   queueLimit: 100000,
 });
 
-const sqlUsers = "SELECT * FROM NewTable";
-const sqlDeals = "SELECT * FROM dealsInfo";
+const sqlComments = "SELECT * FROM comments";
 
-pool.query(sqlUsers, function (err, usersResult) {
-  if (err) {
-    throw err;
-  }
-});
-
-pool.query(sqlDeals, function (err, dealsResult) {
+pool.query(sqlComments, function (err, usersResult) {
   if (err) {
     throw err;
   }
