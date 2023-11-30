@@ -9,6 +9,7 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 1000000,
   queueLimit: 100000,
+  autoReconnect: true,
 });
 
 const sqlComments = "SELECT * FROM comments";

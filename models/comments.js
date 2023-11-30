@@ -5,6 +5,8 @@ const schema = Joi.object({
   email: Joi.string().email().required(),
   homePage: Joi.string().uri(),
   text: Joi.string().required(),
+  imageURL: Joi.string().allow(null),
+  fileTXT: Joi.string().allow(null),
 });
 
 const validateAsync = async (data) => {

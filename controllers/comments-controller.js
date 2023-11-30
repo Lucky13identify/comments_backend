@@ -1,5 +1,6 @@
-const { ctrlWrapper } = require("../helpers");
+const { ctrlWrapper, uploadCloudinary } = require("../helpers");
 const db = require("../config/db");
+const fse = require("fs-extra");
 const comment = require("../models/comments");
 
 const getComments = async (req, res) => {
@@ -41,9 +42,19 @@ const getComments = async (req, res) => {
 const postComment = async (req, res) => {
   const { user, email, homePage, text } = req.body;
 
+  console.log(req);
+
+  const isImage = req.files.picture
+    ? await uploadCloudinary(`./temp/${req.files.picture[0].originalname}`)
+    : null;
+
+  const isFile = req.files.file
+    ? await uploadCloudinary(`./temp/${req.files.file[0].originalname}`)
+    : null;
+
   await comment.validateAsync({ user, email, homePage, text });
 
-  const sql = `INSERT INTO comments (user, email, homePage, text, date) VALUES ('${user}', '${email}', '${homePage}', '${text}', '${new Date()}')`;
+  const sql = `INSERT INTO comments (user, email, homePage, text, date, imageURL, fileTXT) VALUES ('${user}', '${email}', '${homePage}', '${text}', '${new Date()}', '${isImage}', '${isFile}')`;
 
   try {
     await db.query(sql, function (err) {
@@ -51,11 +62,15 @@ const postComment = async (req, res) => {
         throw err;
       }
 
+      fse.emptyDirSync("temp");
+
       res.json({
         user,
         email,
         homePage,
         text,
+        imageURL: isImage,
+        fileTXT: isFile,
       });
     });
   } catch (error) {
