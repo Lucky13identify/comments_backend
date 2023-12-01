@@ -42,8 +42,6 @@ const getComments = async (req, res) => {
 const postComment = async (req, res) => {
   const { user, email, homePage, text } = req.body;
 
-  console.log(req);
-
   const isImage = req.files.picture
     ? await uploadCloudinary(`./temp/${req.files.picture[0].originalname}`)
     : null;
@@ -51,6 +49,13 @@ const postComment = async (req, res) => {
   const isFile = req.files.file
     ? await uploadCloudinary(`./temp/${req.files.file[0].originalname}`)
     : null;
+
+  if (isFile) {
+    const fileSize = req.files.file[0].size;
+    if (fileSize > 100 * 1024) {
+      return res.status(400).json({ message: "Размер файла превышает 100 КБ" });
+    }
+  }
 
   await comment.validateAsync({ user, email, homePage, text });
 

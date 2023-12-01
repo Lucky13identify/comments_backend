@@ -16,18 +16,6 @@ const uploadCloudinary = async (filePath) => {
       resource_type: "auto",
     });
 
-    // if (filePath.endsWith(".txt")) {
-    //   const publicId = result.public_id;
-
-    //   const downloadUrl = cloudinary.url(publicId, {
-    //     fetch_format: "raw",
-    //     attachment: true,
-    //     type: "txt",
-    //   });
-
-    //   return downloadUrl;
-    // }
-
     return result.url;
   } catch (error) {
     console.error("error", error);
