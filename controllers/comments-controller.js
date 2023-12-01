@@ -1,7 +1,9 @@
 const { ctrlWrapper, uploadCloudinary } = require("../helpers");
 const db = require("../config/db");
 const fse = require("fs-extra");
+const sharp = require("sharp");
 const comment = require("../models/comments");
+const { v4: uuidv4 } = require("uuid");
 
 const getComments = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -43,7 +45,7 @@ const postComment = async (req, res) => {
   const { user, email, homePage, text } = req.body;
 
   const isImage = req.files.picture
-    ? await uploadCloudinary(`./temp/${req.files.picture[0].originalname}`)
+    ? await processImage(req.files.picture[0])
     : null;
 
   const isFile = req.files.file
@@ -84,6 +86,39 @@ const postComment = async (req, res) => {
       .status(400)
       .json({ message: "Ошибка валидации данных", error: error.message });
   }
+};
+
+const processImage = async (file) => {
+  const allowedFormats = ["jpg", "jpeg", "png", "gif"];
+
+  if (!allowedFormats.includes(file.mimetype.split("/")[1])) {
+    throw new Error("Недопустимый формат изображения");
+  }
+
+  const image = sharp(file.path);
+  const metadata = await image.metadata();
+
+  const maxWidth = 320;
+  const maxHeight = 240;
+
+  let processedImagePath = file.path;
+
+  if (metadata.width > maxWidth || metadata.height > maxHeight) {
+    const uniqueFileName = `${uuidv4()}-${file.originalname}`;
+    processedImagePath = `./temp/${uniqueFileName}`;
+
+    await image
+      .resize({
+        width: maxWidth,
+        height: maxHeight,
+        fit: "inside",
+      })
+      .toFile(processedImagePath);
+  }
+
+  const processedImageURL = await uploadCloudinary(processedImagePath);
+
+  return processedImageURL;
 };
 
 module.exports = {
