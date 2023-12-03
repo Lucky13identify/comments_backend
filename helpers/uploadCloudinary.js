@@ -1,8 +1,9 @@
-// Require the cloudinary library
 const cloudinary = require("cloudinary").v2;
+const HttpError = require("../helpers");
+
 const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } =
   process.env;
-// Return "https" URLs by setting secure: true
+
 cloudinary.config({
   secure: true,
   cloud_name: CLOUDINARY_CLOUD_NAME,
@@ -19,6 +20,8 @@ const uploadCloudinary = async (filePath) => {
     return result.url;
   } catch (error) {
     console.error("error", error);
+
+    throw HttpError(500, "Internal Server Error");
   }
 };
 

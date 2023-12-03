@@ -1,9 +1,12 @@
-const { ctrlWrapper, uploadCloudinary } = require("../helpers");
+const {
+  ctrlWrapper,
+  uploadCloudinary,
+  imageProcessing,
+  HttpError,
+} = require("../helpers");
 const db = require("../config/db");
 const fse = require("fs-extra");
-const sharp = require("sharp");
 const comment = require("../models/comments");
-const { v4: uuidv4 } = require("uuid");
 
 const getComments = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -13,10 +16,10 @@ const getComments = async (req, res) => {
 
   if (!req.query.page || !req.query.pageSize) {
     const sqlAllComments = "SELECT * FROM comments";
+
     db.query(sqlAllComments, function (err, result) {
       if (err) {
-        res.status(500).json({ message: "Ошибка выполнения GET-запроса" });
-        return;
+        throw HttpError(500, "Internal Server Error");
       }
 
       res.status(200).json({ comments: result });
@@ -28,8 +31,7 @@ const getComments = async (req, res) => {
 
   db.query(sql, function (err, result) {
     if (err) {
-      res.status(500).json({ message: "Ошибка выполнения GET-запроса" });
-      return;
+      throw HttpError(500, "Internal Server Error");
     }
 
     res.status(200).json({
@@ -45,7 +47,7 @@ const postComment = async (req, res) => {
   const { user, email, homePage, text } = req.body;
 
   const isImage = req.files.picture
-    ? await processImage(req.files.picture[0])
+    ? await imageProcessing(req.files.picture[0])
     : null;
 
   const isFile = req.files.file
@@ -55,7 +57,7 @@ const postComment = async (req, res) => {
   if (isFile) {
     const fileSize = req.files.file[0].size;
     if (fileSize > 100 * 1024) {
-      return res.status(400).json({ message: "Размер файла превышает 100 КБ" });
+      throw HttpError(400, "File size exceeds 100 KB.");
     }
   }
 
@@ -66,7 +68,7 @@ const postComment = async (req, res) => {
   try {
     await db.query(sql, function (err) {
       if (err) {
-        throw err;
+        throw HttpError(500, err.message);
       }
 
       fse.emptyDirSync("temp");
@@ -82,43 +84,9 @@ const postComment = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res
-      .status(400)
-      .json({ message: "Ошибка валидации данных", error: error.message });
+
+    throw HttpError(400, error.message);
   }
-};
-
-const processImage = async (file) => {
-  const allowedFormats = ["jpg", "jpeg", "png", "gif"];
-
-  if (!allowedFormats.includes(file.mimetype.split("/")[1])) {
-    throw new Error("Недопустимый формат изображения");
-  }
-
-  const image = sharp(file.path);
-  const metadata = await image.metadata();
-
-  const maxWidth = 320;
-  const maxHeight = 240;
-
-  let processedImagePath = file.path;
-
-  if (metadata.width > maxWidth || metadata.height > maxHeight) {
-    const uniqueFileName = `${uuidv4()}-${file.originalname}`;
-    processedImagePath = `./temp/${uniqueFileName}`;
-
-    await image
-      .resize({
-        width: maxWidth,
-        height: maxHeight,
-        fit: "inside",
-      })
-      .toFile(processedImagePath);
-  }
-
-  const processedImageURL = await uploadCloudinary(processedImagePath);
-
-  return processedImageURL;
 };
 
 module.exports = {

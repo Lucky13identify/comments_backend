@@ -14,7 +14,7 @@ const pool = mysql.createPool({
 
 const sqlComments = "SELECT * FROM comments";
 
-pool.query(sqlComments, function (err, usersResult) {
+pool.query(sqlComments, function (err) {
   if (err) {
     throw err;
   }

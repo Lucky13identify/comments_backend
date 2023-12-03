@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const HttpError = require("../helpers");
 
 const schema = Joi.object({
   user: Joi.string().alphanum().required(),
@@ -13,8 +14,9 @@ const validateAsync = async (data) => {
   try {
     await schema.validateAsync(data);
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error("error", error);
+
+    throw new HttpError(400, error.message);
   }
 };
 

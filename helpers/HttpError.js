@@ -7,7 +7,7 @@ const messages = {
 };
 
 const HttpError = (status, message = messages[status]) => {
-  const error = new Error(message); // create some error for throwing out into catch
+  const error = new Error(message);
   error.status = status;
   return error;
 };
