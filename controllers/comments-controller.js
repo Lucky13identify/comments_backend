@@ -1,3 +1,4 @@
+const fse = require("fs-extra");
 const {
   ctrlWrapper,
   uploadCloudinary,
@@ -5,7 +6,6 @@ const {
   HttpError,
 } = require("../helpers");
 const db = require("../config/db");
-const fse = require("fs-extra");
 const comment = require("../models/comments");
 
 const getComments = async (req, res) => {
