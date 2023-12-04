@@ -3,7 +3,7 @@ An event handler and user token generation were also added when posting a commen
 
 The database used is **MySQL**.
 
-To run the server locally, you need to download this repository, install all dependencies using the terminal command npm i, and start the server with the command npm start.
+To run the server locally, you need to download this repository, install all dependencies using the terminal command **`npm i`**, and start the server with the command **`npm start`**.
 
 The second option involves working with the server via the link **https://comments-xykf.onrender.com** because it is hosted on Render.com and is continuously active.
 
