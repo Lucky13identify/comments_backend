@@ -4,6 +4,8 @@ const {
   uploadCloudinary,
   imageProcessing,
   HttpError,
+  generateToken,
+  eventEmitter,
 } = require("../helpers");
 const db = require("../config/db");
 const comment = require("../models/comments");
@@ -48,30 +50,37 @@ const postComment = async (req, res) => {
 
   const isImage = req.files.picture
     ? await imageProcessing(req.files.picture[0])
-    : null;
+    : "";
 
   const isFile = req.files.file
     ? await uploadCloudinary(`./temp/${req.files.file[0].originalname}`)
-    : null;
-
-  if (isFile) {
-    const fileSize = req.files.file[0].size;
-    if (fileSize > 100 * 1024) {
-      throw HttpError(400, "File size exceeds 100 KB.");
-    }
-  }
+    : "";
 
   await comment.validateAsync({ user, email, homePage, text });
 
-  const sql = `INSERT INTO comments (user, email, homePage, text, date, imageURL, fileTXT) VALUES ('${user}', '${email}', '${homePage}', '${text}', '${new Date()}', '${isImage}', '${isFile}')`;
+  const sql =
+    "INSERT INTO comments (user, email, homePage, text, date, imageURL, fileTXT) VALUES (?, ?, ?, ?, ?, ?, ?)";
+  const values = [user, email, homePage, text, new Date(), isImage, isFile];
 
   try {
-    await db.query(sql, function (err) {
+    await db.query(sql, values, function (err) {
       if (err) {
         throw HttpError(500, err.message);
       }
 
       fse.emptyDirSync("temp");
+
+      const token = generateToken({ user, email });
+
+      eventEmitter.emit("commentPosted", {
+        user,
+        email,
+        homePage,
+        text,
+        imageURL: isImage,
+        fileTXT: isFile,
+        token,
+      });
 
       res.json({
         user,
@@ -80,6 +89,7 @@ const postComment = async (req, res) => {
         text,
         imageURL: isImage,
         fileTXT: isFile,
+        token,
       });
     });
   } catch (error) {
