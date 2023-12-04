@@ -14,7 +14,7 @@ const recaptcha = async (req, res, next) => {
     });
     // В данном случае должно быть так - if (!recaptchaResponse.data.success).
     // Однако, поскольку мы не получаем логику ответа капчи с фронтенда, мы устанавливаем условие успеха.
-    // Если с фронтенда приходит правильный ответ с CAPTCHA, то пройдет проверку middleware и успешно запишет комментарий.
+    // Если с фронтенда приходит правильный ответ с CAPTCHA, то пройдет проверку middleware и успешно запишет комментарий.пш
     if (recaptchaResponse.data.success) {
       throw HttpError(400, "CAPTCHA failed");
     }
