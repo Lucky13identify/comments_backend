@@ -1,5 +1,6 @@
 This backend allows making GET requests, including requests for paginating pages and specifying the amount of information displayed per page. Additionally, a POST request is available for adding a new comment from a user.
-An event handler and user token generation were also added when posting a comment.
+
+**An event handler and user token generation were also added when posting a comment.**
 
 The database used is **`MySQL`**.
 
