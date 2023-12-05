@@ -6,7 +6,7 @@ The database used is **`MySQL`**.
 
 To run the server locally, you need to download this repository, install all dependencies using the terminal command **`npm i`**, and start the server with the command **`npm start`**.
 
-The second option involves working with the server via the link **`https://comments-xykf.onrender.com`** because it is hosted on Render.com and is continuously active.
+The second option involves working with the server via the link **`https://comments3.onrender.com/`** because it is hosted on Render.com and is continuously active.
 
 Making a **`GET`** request with **`parameters`** to the backend will return the number of comments on the specified page, as well as additional information (screenshot below).
 
@@ -37,10 +37,10 @@ http://localhost:8080/api/comments
 ## Hosting
 
 GET request to retrieve all comments:
-https://comments-xykf.onrender.com/api/comments
+https://comments3.onrender.com/api/comments
 
 GET request to retrieve all comments with parameters:
-https://comments-xykf.onrender.com/api/comments/?page=1&pageSize=25
+https://comments3.onrender.com/api/comments/?page=1&pageSize=25
 
 POST request to add a comment:
-https://comments-xykf.onrender.com/api/comments
+https://comments3.onrender.com/api/comments
